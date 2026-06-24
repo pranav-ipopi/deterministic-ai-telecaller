@@ -1,0 +1,40 @@
+Greeting
+   ↓
+Identity Confirmed?
+   ↓
+Explain Enquiry
+   ↓
+Interested?
+   ├── Yes
+   │      ↓
+   │   Ask Model
+   │      ↓
+   │   Ask Location
+   │      ↓
+   │   Ask Timeline
+   │      ↓
+   │   HOT / POSITIVE
+   │
+   ├── Busy
+   │      ↓
+   │   CALLBACK
+   │
+   ├── Later
+   │      ↓
+   │   POSTPONED
+   │
+   ├── Already Purchased
+   │      ↓
+   │   LOST TO COMPETITION
+   │
+   ├── Not Interested
+   │      ↓
+   │   COLD
+   │
+   ├── Need Human
+   │      ↓
+   │   TRANSFER
+   │
+   └── No Answer
+          ↓
+         RNR

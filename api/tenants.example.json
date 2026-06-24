@@ -1,0 +1,24 @@
+[
+  {
+    "customer_name":   "Lakshmi TATA",
+    "dealership_name": "Lakshmi TATA Motors",
+    "agent_persona":   "John",
+    "language":        "hi-IN",
+    "voice":           "rahul",
+    "transfer_to":     "+919876500000",
+    "inbound_did":     "+911140000000",
+    "extra_prompt":    "Mention our year-end discount on Nexon if asked about price.",
+    "callback_url":    "https://crm.lakshmitata.com/api/lead/ai-call-result"
+  },
+  {
+    "customer_name":   "Tristar MG",
+    "dealership_name": "Tristar MG Motors",
+    "agent_persona":   "Priya",
+    "language":        "ta-IN",
+    "voice":           "meera",
+    "transfer_to":     "+919876500001",
+    "inbound_did":     "+911140000001",
+    "extra_prompt":    "",
+    "callback_url":    "https://crm.tristarmg.com/api/lead/ai-call-result"
+  }
+]

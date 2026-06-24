@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  freeswitch:
+    image: freeswitch-mod-audio-stream:latest
+    container_name: freeswitch-ai-agent
+    restart: unless-stopped
+    
+    # ------------------------------------------------------------------------
+    # IMPORTANT PORT MAPPING NOTE:
+    # 
+    # For Production (Linux VPS):
+    # Uncomment `network_mode: "host"` and comment out the `ports:` block below.
+    # Docker's proxy consumes massive amounts of RAM for huge port ranges 
+    # (like 16384-32768 for RTP audio). Host mode bypasses this and fixes NAT.
+    #
+    # For Local Testing (Docker Desktop Windows/Mac):
+    # Keep `network_mode` commented out. We map a heavily restricted RTP 
+    # port range (16384-16484) below so Docker Desktop doesn't crash your PC.
+    # ------------------------------------------------------------------------
+    # network_mode: "host" 
+    
+    ports:
+      # SIP Signaling Ports
+      - "5060:5060/tcp"
+      - "5060:5060/udp"
+      - "5080:5080/tcp"
+      - "5080:5080/udp"
+      
+      # Event Socket (Control Port)
+      - "8021:8021/tcp"
+      
+      # Restricted RTP Audio Range (for local testing only!)
+      - "16384-16484:16384-16484/udp"
+      
+    volumes:
+      # Mount custom configurations here later
+      # - ./conf:/usr/local/freeswitch/conf
+      - freeswitch-sounds:/usr/local/freeswitch/sounds
+      
+    environment:
+      - TZ=UTC
+      # Set FreeSWITCH to only use the restricted port range for local testing
+      # (In production with host networking, you can remove this restriction)
+      - SWITCH_PORT_START=16384
+      - SWITCH_PORT_END=16484
+
+volumes:
+  freeswitch-sounds:

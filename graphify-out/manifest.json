@@ -1,0 +1,277 @@
+{
+  "AI-telecaller/ALR EXPORT.postman_collection.json": {
+    "mtime": 1781939157.0063531,
+    "ast_hash": "6ef0053c9da400c1d1ae4516b25ce54b",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/agent/agent.py": {
+    "mtime": 1782108228.1188695,
+    "ast_hash": "2f1034df2922d4057de3864f52c84723",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/agent/agent_previous/agent.py": {
+    "mtime": 1781698371.1302898,
+    "ast_hash": "6ddd8edba6a363b361ebe218417ccbd6",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/agent/status.py": {
+    "mtime": 1781850509.5217116,
+    "ast_hash": "baa98bbe6773e191b6bd63dd58bdf99c",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/api/admin.py": {
+    "mtime": 1781942836.9981146,
+    "ast_hash": "f038117b5b3aede8f2aef65b0fefd3e5",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/api/main.py": {
+    "mtime": 1781942835.5863814,
+    "ast_hash": "6bc26f3dec00db93589c07f918f0a7c9",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/api/seed_tenants.py": {
+    "mtime": 1781850509.562812,
+    "ast_hash": "efed41b2bfdd2022467ea98f3cdc9518",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/api/sync_inbound_rules.py": {
+    "mtime": 1781850509.5686927,
+    "ast_hash": "47df3f98695750bca25cbdf57f29c6fb",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/api/tenants.example.json": {
+    "mtime": 1781850509.579867,
+    "ast_hash": "92f442cbfbf6fe23966df53d4cf0a70f",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/create_trunk/outbound-trunk.json": {
+    "mtime": 1781864132.714159,
+    "ast_hash": "266a998313efb1317df781b1327b960b",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/observability_logs/observability-RM_qfvMVxLkeDzA/p_3heecjuct9c_RM_qfvMVxLkeDzA_chat_history.json": {
+    "mtime": 1782107944.7787578,
+    "ast_hash": "96f4fc0fe854cc43f6eaf6f2d0b4c589",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/observability_logs/observability-RM_qfvMVxLkeDzA/p_3heecjuct9c_RM_qfvMVxLkeDzA_logs.json": {
+    "mtime": 1782107944.739728,
+    "ast_hash": "b72aae577091c1fb2cb45d5f6f840fcb",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/observability_logs/observability-RM_qfvMVxLkeDzA/p_3heecjuct9c_RM_qfvMVxLkeDzA_metrics.json": {
+    "mtime": 1782107944.71487,
+    "ast_hash": "f72fdcd7db382c6f6aab89f8fd8795dc",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/observability_logs/observability-RM_qfvMVxLkeDzA/p_3heecjuct9c_RM_qfvMVxLkeDzA_traces.json": {
+    "mtime": 1782107944.7245567,
+    "ast_hash": "60db5e2d2e462a087118be82c1419253",
+    "semantic_hash": ""
+  },
+  "agent-config.json": {
+    "mtime": 1782281947.8590672,
+    "ast_hash": "6d2f0c1a7b5d34edf3966f2c4c7a4920",
+    "semantic_hash": ""
+  },
+  "api/admin.py": {
+    "mtime": 1781942836.9981146,
+    "ast_hash": "f038117b5b3aede8f2aef65b0fefd3e5",
+    "semantic_hash": ""
+  },
+  "api/main.py": {
+    "mtime": 1781942835.5863814,
+    "ast_hash": "6bc26f3dec00db93589c07f918f0a7c9",
+    "semantic_hash": ""
+  },
+  "api/seed_tenants.py": {
+    "mtime": 1781850509.562812,
+    "ast_hash": "efed41b2bfdd2022467ea98f3cdc9518",
+    "semantic_hash": ""
+  },
+  "api/sync_inbound_rules.py": {
+    "mtime": 1781850509.5686927,
+    "ast_hash": "47df3f98695750bca25cbdf57f29c6fb",
+    "semantic_hash": ""
+  },
+  "api/tenants.example.json": {
+    "mtime": 1781850509.579867,
+    "ast_hash": "92f442cbfbf6fe23966df53d4cf0a70f",
+    "semantic_hash": ""
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1782286396.0050926,
+    "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/SKILL.md": {
+    "mtime": 1782286395.9557228,
+    "ast_hash": "2e44981722f69e3cd7838f03e9b43ef5",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/references/add-watch.md": {
+    "mtime": 1782228340.8563008,
+    "ast_hash": "d59d027fe449f06aa03905a01184e779",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/references/exports.md": {
+    "mtime": 1782228340.877046,
+    "ast_hash": "9da2a2152e60a22f07f05fed5158f287",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1782228340.8790548,
+    "ast_hash": "2e620982acb506f557538cdcfb1ef6da",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1782228340.9380803,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/references/hooks.md": {
+    "mtime": 1782228340.9399836,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/references/query.md": {
+    "mtime": 1782228340.9621742,
+    "ast_hash": "0b329f30b63b0bd89282848575c86428",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/references/transcribe.md": {
+    "mtime": 1782228340.9621742,
+    "ast_hash": "67b6a5fa6c0974e18f60db9f8932fbd8",
+    "semantic_hash": ""
+  },
+  ".agents/skills/graphify/references/update.md": {
+    "mtime": 1782228340.9641826,
+    "ast_hash": "c698309979460d0f02ba616417844399",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1782286396.0074549,
+    "ast_hash": "637776aa6f7496d069afe7520c845c8a",
+    "semantic_hash": ""
+  },
+  "AGENT_PROJECT_INITIALIZATION.md": {
+    "mtime": 1782281967.2518425,
+    "ast_hash": "072ba61991a6ef397484a4d11774e4bd",
+    "semantic_hash": ""
+  },
+  "AGENT_QUICK_REFERENCE.md": {
+    "mtime": 1782281842.8479512,
+    "ast_hash": "73a486d6b3655c83938f1e576c882b99",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/README.md": {
+    "mtime": 1782107179.3870873,
+    "ast_hash": "15180fa12b17bf3f03c599d23847b1b7",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/SETUP_FROM_SCRATCH.md": {
+    "mtime": 1781936700.2676704,
+    "ast_hash": "73d4a343ea03afb7930781d70d4bd9ca",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/admin_ui.md": {
+    "mtime": 1781855610.4365923,
+    "ast_hash": "30a099fc6d86e0243f61ddb700d57aaf",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/agent/requirements.txt": {
+    "mtime": 1782106541.7533627,
+    "ast_hash": "5269834112564ee26b697f5172feda2a",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/api/requirements.txt": {
+    "mtime": 1781855544.2148843,
+    "ast_hash": "6d3a62bfd18a3c6db6f87e82bd3ddae1",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/database.md": {
+    "mtime": 1781857426.6149597,
+    "ast_hash": "87a4f608164f215258f46192f70c83bc",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/docker-compose.yml": {
+    "mtime": 1781938387.1589801,
+    "ast_hash": "9a1510081bff70919168db64810d6306",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/docs/TESTING_OUTBOUND.md": {
+    "mtime": 1781942946.7973864,
+    "ast_hash": "f7c26c8e46656cd7ee077c0e8422b275",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/docs/alr_changes.md": {
+    "mtime": 1781850509.5948658,
+    "ast_hash": "e694c31e46ceca7a7f3070427ab21068",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/docs/costs.md": {
+    "mtime": 1781850509.6005664,
+    "ast_hash": "c05419cd987b0aac2b965f304f5a297f",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/docs/inbound.md": {
+    "mtime": 1781850509.6080098,
+    "ast_hash": "5d41be9c88037f185f611f06e1016f9b",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/docs/known_leads_callback_context.md": {
+    "mtime": 1781870578.82296,
+    "ast_hash": "20e2454efcfb49e1c88d051e9558fd85",
+    "semantic_hash": ""
+  },
+  "AI-telecaller/docs/setup.md": {
+    "mtime": 1782107190.1828637,
+    "ast_hash": "ddece253d93bf0fce1713f12041bbab6",
+    "semantic_hash": ""
+  },
+  "IMPLEMENTATION_PLAN.md": {
+    "mtime": 1782281956.7631066,
+    "ast_hash": "7fc957c4d3fdc4ab6a39213ebb698a16",
+    "semantic_hash": ""
+  },
+  "api/requirements.txt": {
+    "mtime": 1781855544.2148843,
+    "ast_hash": "6d3a62bfd18a3c6db6f87e82bd3ddae1",
+    "semantic_hash": ""
+  },
+  "docs/TESTING_OUTBOUND.md": {
+    "mtime": 1781942946.7973864,
+    "ast_hash": "f7c26c8e46656cd7ee077c0e8422b275",
+    "semantic_hash": ""
+  },
+  "docs/alr_changes.md": {
+    "mtime": 1781850509.5948658,
+    "ast_hash": "e694c31e46ceca7a7f3070427ab21068",
+    "semantic_hash": ""
+  },
+  "docs/costs.md": {
+    "mtime": 1781850509.6005664,
+    "ast_hash": "c05419cd987b0aac2b965f304f5a297f",
+    "semantic_hash": ""
+  },
+  "docs/inbound.md": {
+    "mtime": 1781850509.6080098,
+    "ast_hash": "5d41be9c88037f185f611f06e1016f9b",
+    "semantic_hash": ""
+  },
+  "docs/known_leads_callback_context.md": {
+    "mtime": 1781870578.82296,
+    "ast_hash": "20e2454efcfb49e1c88d051e9558fd85",
+    "semantic_hash": ""
+  },
+  "docs/setup.md": {
+    "mtime": 1782107190.1828637,
+    "ast_hash": "ddece253d93bf0fce1713f12041bbab6",
+    "semantic_hash": ""
+  },
+  "flow.txt": {
+    "mtime": 1782285789.2320664,
+    "ast_hash": "9c8f88fb9ab708d4fba0f2577961d027",
+    "semantic_hash": ""
+  }
+}

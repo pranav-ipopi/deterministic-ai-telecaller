@@ -1,0 +1,82 @@
+# --- Stage 1: Build Environment ---
+FROM ubuntu:22.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    build-essential cmake git wget autoconf automake libtool pkg-config \
+    libssl-dev libsqlite3-dev libcurl4-openssl-dev libpcre3-dev \
+    libspeex-dev libspeexdsp-dev libldns-dev libedit-dev libtiff5-dev \
+    yasm libopus-dev libsndfile1-dev libavformat-dev libswscale-dev \
+    liblua5.2-dev libpq-dev uuid-dev zlib1g-dev libevent-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Compile spandsp (REQUIRED dependency for FreeSWITCH v1.10)
+# Compile spandsp (REQUIRED dependency for FreeSWITCH v1.10)
+RUN cd /usr/src && git clone https://github.com/freeswitch/spandsp.git \
+    && cd spandsp \
+    && git checkout 67d2455 \
+    && ./bootstrap.sh \
+    && ./configure \
+    && make -j$(nproc) \
+    && make install \
+    && ldconfig
+
+# Compile sofia-sip (REQUIRED dependency for FreeSWITCH v1.10)
+RUN cd /usr/src && git clone https://github.com/freeswitch/sofia-sip.git \
+    && cd sofia-sip \
+    && ./bootstrap.sh \
+    && ./configure \
+    && make -j$(nproc) \
+    && make install \
+    && ldconfig
+
+# Compile FreeSWITCH
+RUN cd /usr/src && git clone -b v1.10 https://github.com/signalwire/freeswitch.git \
+    && cd freeswitch \
+    && ./bootstrap.sh -j \
+    && sed -i -e 's|endpoints/mod_verto|#endpoints/mod_verto|g' -e 's|applications/mod_signalwire|#applications/mod_signalwire|g' modules.conf \
+    && ./configure -C --prefix=/usr/local/freeswitch \
+    && make -j$(nproc) \
+    && make install
+
+# Compile mod_audio_stream
+RUN git clone --recurse-submodules https://github.com/amigniter/mod_audio_stream.git /usr/src/mod_audio_stream \
+    && cd /usr/src/mod_audio_stream \
+    && mkdir build && cd build \
+    && export PKG_CONFIG_PATH=/usr/local/freeswitch/lib/pkgconfig:$PKG_CONFIG_PATH \
+    && cmake -DFREESWITCH_SRC_DIR=/usr/src/freeswitch -DFREESWITCH_CORE_LIBRARY=/usr/local/freeswitch/lib/libfreeswitch.so .. \
+    && make \
+    && mkdir -p /usr/local/freeswitch/mod \
+    && cp mod_audio_stream.so /usr/local/freeswitch/mod/
+
+# Enable the module in the config
+RUN cp -r /usr/src/freeswitch/conf/vanilla /usr/local/freeswitch/conf \
+    && sed -i '/<load module="mod_console"\/>/a \ \ \ \ <load module="mod_audio_stream"\/>' /usr/local/freeswitch/conf/autoload_configs/modules.conf.xml
+
+# --- Stage 2: Tiny Production Image ---
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install ONLY runtime libraries (no compilers, no source code)
+RUN apt-get update && apt-get install -y \
+    libssl3 libsqlite3-0 libcurl4 libpcre3 \
+    libspeex1 libspeexdsp1 libldns3 libedit2 libtiff5 \
+    libopus0 libsndfile1 libavformat58 libswscale5 \
+    liblua5.2-0 libpq5 uuid zlib1g libevent-2.1-7 libevent-pthreads-2.1-7 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the compiled binaries, config, and libraries from Stage 1
+COPY --from=builder /usr/local/freeswitch /usr/local/freeswitch
+COPY --from=builder /usr/local/lib/libspandsp* /usr/local/lib/
+COPY --from=builder /usr/local/lib/libsofia-sip-ua* /usr/local/lib/
+
+# Register the new spandsp library path in Stage 2
+RUN ldconfig
+
+ENV PATH="/usr/local/freeswitch/bin:${PATH}"
+
+EXPOSE 5060/tcp 5060/udp 5080/tcp 5080/udp 8021/tcp 16384-32768/udp
+
+CMD ["freeswitch", "-nonat", "-c"]

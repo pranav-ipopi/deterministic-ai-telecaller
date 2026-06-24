@@ -1,0 +1,354 @@
+{
+  "project": {
+    "name": "Ipopi AI Voice Agent",
+    "version": "1.0.0",
+    "purpose": "Automotive lead qualification via phone calls",
+    "last_updated": "2026-06-24"
+  },
+  "goal": {
+    "primary": "Qualify automotive leads and book appointments",
+    "success_metrics": {
+      "qualification_rate": ">30%",
+      "cost_per_qualified_lead": "<₹50",
+      "avg_call_duration": "1.5-3 minutes",
+      "noshow_rate": "<40%",
+      "intent_accuracy": ">95%",
+      "llm_fallback_usage": "<10%"
+    }
+  },
+  "constraints": {
+    "call_hours": {
+      "start": "09:00",
+      "end": "20:00",
+      "timezone": "Asia/Kolkata"
+    },
+    "max_call_duration_minutes": 5,
+    "max_concurrent_calls": 50,
+    "max_retries_per_state": 2,
+    "silence_timeout_seconds": 10,
+    "languages": [
+      "hi-IN",
+      "en-IN"
+    ],
+    "forbidden_actions": [
+      "promise_discounts_without_approval",
+      "share_pricing_without_approval",
+      "call_dnd_numbers",
+      "call_outside_hours",
+      "use_profanity",
+      "hallucinate_inventory",
+      "collect_payment_info",
+      "transfer_without_trigger"
+    ]
+  },
+  "state_machine": {
+    "states": [
+      "START",
+      "INTRO",
+      "VERIFY_PERSON",
+      "VERIFY_CONSENT",
+      "QUALIFY_NEED",
+      "QUALIFY_BUDGET",
+      "QUALIFY_TIMING",
+      "QUALIFY_MODEL",
+      "BOOK_MEETING",
+      "CONFIRM_DETAILS",
+      "SCHEDULE_CALLBACK",
+      "NOT_INTERESTED",
+      "DND_REQUEST",
+      "TRANSFER_HUMAN",
+      "END"
+    ],
+    "initial_state": "START",
+    "terminal_states": [
+      "END",
+      "DND_REQUEST",
+      "TRANSFER_HUMAN"
+    ],
+    "global_transitions": {
+      "NOT_INTERESTED": "NOT_INTERESTED",
+      "BUSY": "SCHEDULE_CALLBACK",
+      "DND": "DND_REQUEST",
+      "TRANSFER": "TRANSFER_HUMAN"
+    },
+    "max_state_loops": 2
+  },
+  "intent_router": {
+    "layers": [
+      {
+        "name": "regex",
+        "priority": 1,
+        "confidence": 1.0,
+        "expected_coverage": 0.5,
+        "patterns": {
+          "YES": "\\b(yes|yeah|yup|sure|correct|haan|h\\s*aan|ji|han|theek|ok|okay|sahi)\\b",
+          "NO": "\\b(no|nope|nah|nahi|n\\s*ahi|pass|nako|nahi chahiye)\\b",
+          "BUSY": "\\b(busy|meeting|call later|baad mein|occupied|abhi nahi|time nahi)\\b",
+          "NOT_INTERESTED": "\\b(not interested|remove|stop calling|dnd|do not disturb|nahi chahiye|band karo)\\b",
+          "CALLBACK": "\\b(callback|call back|later|evening|tomorrow|kal|shaam|subah)\\b",
+          "PRICE": "\\b(price|cost|pricing|kitna|rate|charges|paise|daam)\\b",
+          "EMAIL": "\\b(email|mail|send|bhejo|bhej|message|whatsapp)\\b",
+          "REPEAT": "\\b(repeat|again|dubara|phir se|what did you say|kya bola)\\b",
+          "BOOK": "\\b(book|schedule|appointment|demo|test drive|visit|aao|aa jao)\\b",
+          "TRANSFER": "\\b(human|agent|manager|supervisor|baat karwao|kisi se baat)\\b",
+          "DND": "\\b(dnd|do not call|stop|band karo|mat karo)\\b"
+        }
+      },
+      {
+        "name": "keywords",
+        "priority": 2,
+        "confidence": 0.85,
+        "expected_coverage": 0.25,
+        "keyword_map": {
+          "YES": [
+            "haan ji",
+            "haan bolo",
+            "bolo",
+            "batao",
+            "sun raha hoon",
+            "theek hai ji"
+          ],
+          "NO": [
+            "nahi ji",
+            "nahi bhai",
+            "nahi abhi",
+            "baad mein",
+            "soch ke batata hoon"
+          ],
+          "BUSY": [
+            "ghar pe nahi hoon",
+            "office mein hoon",
+            "driving",
+            "gaadi chala raha hoon"
+          ],
+          "CALLBACK": [
+            "shaam ko",
+            "6 baje",
+            "kal subah",
+            "next week",
+            "weekend pe"
+          ]
+        }
+      },
+      {
+        "name": "fuzzy",
+        "priority": 3,
+        "confidence_range": [
+          0.7,
+          0.85
+        ],
+        "expected_coverage": 0.15,
+        "threshold": {
+          "short_phrase": 3,
+          "long_phrase": 5
+        }
+      },
+      {
+        "name": "llm_fallback",
+        "priority": 4,
+        "confidence_range": [
+          0.8,
+          0.95
+        ],
+        "expected_coverage": 0.1,
+        "trigger_condition": "all_above_layers_confidence < 0.8"
+      }
+    ]
+  },
+  "llm": {
+    "provider": "groq",
+    "model": "llama3-8b-8192",
+    "temperature": 0.1,
+    "max_tokens": 50,
+    "response_format": "json_object",
+    "allowed_intents": [
+      "YES",
+      "NO",
+      "BUSY",
+      "CALLBACK",
+      "NOT_INTERESTED",
+      "PRICE",
+      "EMAIL",
+      "REPEAT",
+      "BOOK",
+      "TRANSFER",
+      "DND",
+      "UNKNOWN"
+    ],
+    "system_prompt": "You are an intent classifier for an automotive lead qualification phone agent. Your ONLY job is to classify the user's spoken response into one of the allowed intents. Return ONLY a JSON object. No explanations, no markdown, no extra text. Format: {\"intent\": \"INTENT_NAME\", \"confidence\": 0.95, \"extracted_info\": \"any time/date/model mentioned\"}"
+  },
+  "audio_engine": {
+    "response_hierarchy": [
+      {
+        "type": "pre_recorded_wav",
+        "priority": 1,
+        "usage_target": 0.8,
+        "latency_ms": 5,
+        "cost_per_use": 0
+      },
+      {
+        "type": "cached_tts",
+        "priority": 2,
+        "usage_target": 0.15,
+        "latency_ms": 50,
+        "cost_per_use": 1.5
+      },
+      {
+        "type": "live_tts",
+        "priority": 3,
+        "usage_target": 0.05,
+        "latency_ms": 200,
+        "cost_per_use": 1.5
+      }
+    ],
+    "cache_config": {
+      "max_size": 1000,
+      "estimated_memory_mb": 500,
+      "eviction_policy": "LRU"
+    },
+    "audio_format": {
+      "sample_rate_hz": 8000,
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "container": "wav"
+    },
+    "max_response_length_words": 150,
+    "max_response_duration_seconds": 20
+  },
+  "tts": {
+    "provider": "sarvam",
+    "model": "bulbul:v2",
+    "speakers": {
+      "sales": "meera",
+      "service": "arvind"
+    },
+    "languages": [
+      "hi-IN",
+      "en-IN"
+    ],
+    "pace": 1.0,
+    "loudness": 1.0,
+    "enable_preprocessing": true
+  },
+  "stt": {
+    "provider": "sarvam",
+    "model": "saarika:v2",
+    "language_code": "hi-IN",
+    "sample_rate": 8000,
+    "vad_enabled": true
+  },
+  "agent_personality": {
+    "name": "Pranav",
+    "gender": "male",
+    "age_range": "28-32",
+    "region": "neutral_hindi",
+    "tone": "warm_professional",
+    "pace": "moderate",
+    "language_rules": {
+      "use_ji_suffix": true,
+      "use_dhanyavaad": true,
+      "use_aap_formal": true,
+      "avoid_tum_informal": true,
+      "prefer_hindi_words": true
+    }
+  },
+  "compliance": {
+    "telemarketing_rules": {
+      "call_window": {
+        "start": "09:00",
+        "end": "20:00"
+      },
+      "dnd_check_required": true,
+      "opt_out_phrase": "Agar aap future mein calls nahi chahate, toh 'DND' boliye",
+      "recording_retention_days": 90,
+      "lead_data_retention_years": 2
+    },
+    "forbidden_phrases": [
+      "I am an AI",
+      "I don't know",
+      "That's not my job",
+      "I cannot help you"
+    ],
+    "data_privacy": {
+      "no_payment_collection": true,
+      "no_aadhaar_pan_collection": true,
+      "encryption_at_rest": true,
+      "authorized_access_only": true
+    }
+  },
+  "error_recovery": {
+    "stt_timeout": {
+      "timeout_seconds": 5,
+      "max_attempts": 3,
+      "fallback_message": "Maaf kijiye, network thoda slow hai. Main dobara bolta hoon.",
+      "final_action": "SCHEDULE_CALLBACK"
+    },
+    "tts_failure": {
+      "fallback_message": "Maaf kijiye, technical issue hai. Main aapko call back karunga.",
+      "final_action": "SCHEDULE_CALLBACK"
+    },
+    "llm_failure": {
+      "fallback_to_keyword_layer": true,
+      "default_intent": "UNKNOWN",
+      "alert_webhook": true
+    },
+    "websocket_failure": {
+      "reconnect_attempts": 4,
+      "backoff_strategy": "exponential",
+      "fallback_message": "Network issue aa raha hai. Main aapko baad mein call karunga.",
+      "final_action": "SCHEDULE_CALLBACK"
+    }
+  },
+  "integrations": {
+    "crm": {
+      "provider": "supabase",
+      "webhook_url": "https://your-n8n-instance.com/webhook/lead-update",
+      "sync_fields": [
+        "lead_id",
+        "status",
+        "transcript",
+        "call_duration",
+        "intent_distribution"
+      ]
+    },
+    "sip_trunk": {
+      "provider": "vobiz",
+      "protocol": "SIP",
+      "registration_required": true
+    },
+    "monitoring": {
+      "process_manager": "pm2",
+      "system_monitor": "netdata",
+      "log_format": "jsonl"
+    }
+  },
+  "improvement_loop": {
+    "weekly_review": {
+      "metrics": [
+        "qualification_rate",
+        "cost_per_lead",
+        "intent_accuracy",
+        "llm_usage_pct"
+      ],
+      "actions": [
+        "add_new_patterns",
+        "update_keywords",
+        "review_failed_intents"
+      ]
+    },
+    "monthly_review": {
+      "actions": [
+        "ab_test_scripts",
+        "update_wavs",
+        "review_competitor_pricing",
+        "check_api_updates"
+      ]
+    },
+    "continuous_rules": {
+      "new_intent_threshold_weekly": 5,
+      "llm_usage_alert_threshold": 0.15,
+      "qualification_rate_alert_threshold": 0.25,
+      "cost_per_lead_alert_threshold": 50
+    }
+  }
+}
