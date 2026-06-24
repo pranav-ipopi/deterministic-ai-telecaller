@@ -19,7 +19,6 @@ from typing import Optional
 
 from fastapi import APIRouter, Cookie, Form, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from livekit import api
 from pydantic import BaseModel
 
 from main import db   # reuse the same SQLite helper
@@ -33,9 +32,6 @@ COOKIE_SECRET      = os.environ.get("ADMIN_COOKIE_SECRET") or secrets.token_hex(
 COOKIE_NAME        = "alr_admin"
 COOKIE_MAX_AGE     = 60 * 60 * 8       # 8 hours
 
-LIVEKIT_URL        = os.environ.get("LIVEKIT_URL")
-LIVEKIT_API_KEY    = os.environ.get("LIVEKIT_API_KEY")
-LIVEKIT_API_SECRET = os.environ.get("LIVEKIT_API_SECRET")
 SIP_INBOUND_TRUNK_ID = os.environ.get("SIP_INBOUND_TRUNK_ID", "")
 INBOUND_AGENT      = os.environ.get("INBOUND_AGENT", "inbound-caller")
 RULE_PREFIX        = "alr-inbound-"
@@ -242,62 +238,8 @@ def purge_all_leads(alr_admin: Optional[str] = Cookie(default=None)):
 
 # ─── LiveKit SIP rule sync (in-process) ───────────────────────────────
 async def _sync_inbound_rules() -> dict:
-    """Delete all `alr-inbound-*` rules and recreate from current tenants.db.
-    Returns a small status dict the UI can show."""
-    if not (LIVEKIT_URL and LIVEKIT_API_KEY and LIVEKIT_API_SECRET):
-        return {"ok": False, "skipped": "LIVEKIT_* env not set"}
-    if not SIP_INBOUND_TRUNK_ID:
-        return {"ok": False, "skipped": "SIP_INBOUND_TRUNK_ID not set"}
-
-    with db() as conn:
-        rows = conn.execute(
-            "SELECT customer_name, inbound_did FROM tenants "
-            "WHERE is_active = 1 AND inbound_did IS NOT NULL AND inbound_did != ''"
-        ).fetchall()
-    tenants = [dict(r) for r in rows]
-
-    lk = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
-    deleted = created = 0
-    errors: list[str] = []
-    try:
-        existing = await lk.sip.list_sip_dispatch_rule(api.ListSIPDispatchRuleRequest())
-        for r in existing.items:
-            if (r.name or "").startswith(RULE_PREFIX):
-                try:
-                    await lk.sip.delete_sip_dispatch_rule(
-                        api.DeleteSIPDispatchRuleRequest(sip_dispatch_rule_id=r.sip_dispatch_rule_id)
-                    )
-                    deleted += 1
-                except Exception as e:
-                    errors.append(f"delete {r.name}: {e}")
-
-        for t in tenants:
-            slug = _slug(t["customer_name"])
-            metadata = json.dumps({"direction": "inbound", "customer_name": t["customer_name"]})
-            rule = api.SIPDispatchRuleInfo(
-                name=f"{RULE_PREFIX}{slug}",
-                trunk_ids=[SIP_INBOUND_TRUNK_ID],
-                inbound_numbers=[t["inbound_did"]],
-                rule=api.SIPDispatchRule(
-                    dispatch_rule_individual=api.SIPDispatchRuleIndividual(
-                        room_prefix=f"in-{slug}-",
-                    ),
-                ),
-                room_config=api.RoomConfiguration(
-                    agents=[api.RoomAgentDispatch(agent_name=INBOUND_AGENT, metadata=metadata)],
-                ),
-            )
-            try:
-                await lk.sip.create_sip_dispatch_rule(
-                    api.CreateSIPDispatchRuleRequest(dispatch_rule=rule)
-                )
-                created += 1
-            except Exception as e:
-                errors.append(f"create {t['customer_name']}: {e}")
-    finally:
-        await lk.aclose()
-
-    return {"ok": not errors, "deleted": deleted, "created": created, "errors": errors}
+    """Legacy LiveKit sync. Now obsolete with FreeSWITCH dialplan."""
+    return {"ok": True, "skipped": "Obsolete with FreeSWITCH direct routing"}
 
 
 # ─── Inline HTML (no separate template files) ─────────────────────────

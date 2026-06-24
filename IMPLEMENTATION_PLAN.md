@@ -1,32 +1,35 @@
 # Implementation Plan for AI Voice Agent V1 (FreeSWITCH + Deterministic Hybrid)
 
-This plan details the end-to-end implementation of the AI Voice Agent for Automotive Lead Qualification. It is designed to comfortably handle **5,000 calls/day across 300 agencies** using a robust, single-service Python architecture with 5 critical production reinforcements.
+This plan details the end-to-end implementation of the AI Voice Agent for Automotive Lead Qualification. It is designed to comfortably handle **5,000 calls/day across 300 agencies** using a robust Dockerized architecture with 5 critical production reinforcements.
 
-We are using the existing Python `api/main.py` to handle both CRM webhooks AND the real-time FreeSWITCH WebSocket, completely eliminating the need for Node.js.
+We are using a single-service Python `api/main.py` backend to handle both CRM webhooks AND the real-time FreeSWITCH WebSocket, completely eliminating the need for Node.js.
 
 ## Architecture Highlights
-- **FreeSWITCH**: Handles all SIP, RTP, and audio stream routing. Extremely lightweight and fast.
-- **FastAPI (Python)**: Handles `POST /dispatch` from ALR, manages the SQLite tenant DB, and exposes a `ws://` endpoint to receive the raw audio from FreeSWITCH.
+- **FreeSWITCH (Dockerized)**: Custom compiled image with `mod_audio_stream`. Handles all SIP, RTP, and audio stream routing. Extremely lightweight and fast.
+- **FastAPI (Python Docker Container)**: Handles `POST /dispatch` from ALR, manages the SQLite tenant DB, and exposes a `ws://` endpoint to receive the raw audio from FreeSWITCH.
+- **FreeSWITCH Dialplan**: XML routing rules that instruct FreeSWITCH to answer calls and pipe audio out to the Python WebSocket.
 - **Async ESL (Greenswitch)**: Persistent TCP connection to FreeSWITCH (port 8021) for outbound calls and channel variables.
 - **Audio Buffering & Caching**: 1-2 second chunk buffering for Sarvam STT stability, and `lru_cache`/`diskcache` for Sarvam TTS speed.
-- **Local Testing First**: Complete end-to-end testing on WSL2 Ubuntu using `setup_wsl.sh` and placeholder audio.
 
 ## Proposed Changes
 
-### Core Infrastructure (WSL Local)
+### Core Infrastructure (Docker & Telephony)
 
-#### [NEW] [setup_wsl.sh](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/setup_wsl.sh)
-A single bash script that installs FreeSWITCH (`freeswitch-meta-all`), compiles `mod_audio_stream`, and starts the service.
+#### [MODIFY] [docker-compose.yml](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/docker-compose.yml)
+Update the existing compose file to include the Python API container, ensuring it shares a network with FreeSWITCH so Greenswitch and WebSockets can communicate via internal DNS (e.g., `ws://api:8000/ws`).
 
-#### [NEW] [generate-placeholders.sh](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/generate-placeholders.sh)
-A bash script using native Linux `espeak` and `ffmpeg` tools to generate all `.wav` audio files required by the flow.
+#### [NEW] [conf/dialplan/default.xml](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/conf/dialplan/default.xml)
+Custom FreeSWITCH dialplan. When a call is connected, it executes the `audio_stream` application pointing to the FastAPI WebSocket endpoint.
+
+#### [NEW] [conf/autoload_configs/event_socket.conf.xml](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/conf/autoload_configs/event_socket.conf.xml)
+Update the ESL configuration to bind to `0.0.0.0` and set a secure password so the Python container can execute originate commands.
 
 ---
 
 ### API & Core Engine (Python only)
 
 #### [MODIFY] [api/requirements.txt](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/api/requirements.txt)
-Remove `livekit` dependencies. Add `fastapi`, `uvicorn`, `pydantic`, `websockets`, `greenswitch`, `diskcache`.
+Add `fastapi`, `uvicorn`, `pydantic`, `websockets`, `greenswitch`, `diskcache`.
 
 #### [MODIFY] [api/main.py](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/api/main.py)
 1. **ESL Connection Management**: Initialize `greenswitch.InboundESL` on startup with persistent connection and graceful shutdown.

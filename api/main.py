@@ -3,12 +3,12 @@ ALR Voice Agent — minimal multi-tenant dispatch API.
 
 ONE endpoint: POST /dispatch
   - Auth: X-API-Key header (shared with ALR)
-  - Body: the ALR lead JSON (exactly as today)
-  - Action: look up tenant by customer_name in tenants.db, then call
-    LiveKit's AgentDispatch API with all the metadata the agent needs.
+  - Body: the ALR lead JSON
+  - Action: look up tenant by customer_name in tenants.db, then originate
+    an outbound call via FreeSWITCH ESL.
 
-That's it. LiveKit Cloud handles queueing, retries, scaling, and dispatch.
-The agent posts results directly back to ALR (no relay through here).
+WebSocket Endpoint: /ws/{call_id}
+  - Accepts raw audio streams from FreeSWITCH mod_audio_stream.
 """
 from __future__ import annotations
 
@@ -19,25 +19,18 @@ import time
 from contextlib import contextmanager
 from typing import Any
 
-from fastapi import FastAPI, Header, HTTPException
-from livekit import api
+from fastapi import FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
-# ─── Config ────────────────────────────────────────────────────────────
-LIVEKIT_URL        = os.environ["LIVEKIT_URL"]
-LIVEKIT_API_KEY    = os.environ["LIVEKIT_API_KEY"]
-LIVEKIT_API_SECRET = os.environ["LIVEKIT_API_SECRET"]
-SHARED_API_KEY     = os.environ["SHARED_API_KEY"]       # ALR <-> api auth
-AGENT_API_KEY      = os.environ["AGENT_API_KEY"]        # agent <-> api auth (lookups + callbacks)
-DB_PATH            = os.environ.get("DB_PATH", "tenants.db")
-OUTBOUND_AGENT     = os.environ.get("OUTBOUND_AGENT", "outbound-caller")
+import httpx
 
-# How long (days) to keep a lead's context for inbound callback recognition.
-# After TTL expires the row is deleted and the agent asks name from scratch.
+# ─── Config ────────────────────────────────────────────────────────────
+SHARED_API_KEY     = os.environ.get("SHARED_API_KEY", "default-secret")
+AGENT_API_KEY      = os.environ.get("AGENT_API_KEY", "default-agent-secret")
+DB_PATH            = os.environ.get("DB_PATH", "tenants.db")
 LEAD_TTL_DAYS      = int(os.environ.get("LEAD_TTL_DAYS", "30"))
 
 app = FastAPI(title="AI Telecaller Dispatch")
-
 
 # ─── DB (two tables: tenants + known_leads) ────────────────────────────
 SCHEMA = """
@@ -55,9 +48,6 @@ CREATE TABLE IF NOT EXISTS tenants (
 );
 CREATE INDEX IF NOT EXISTS idx_tenants_did ON tenants(inbound_did);
 
--- Separate table so high-volume lead writes never slow down tenant lookups.
--- One row per (phone, dealership). Upserted on every /dispatch call.
--- Inbound agent hits GET /lead/by-phone before greeting to load context.
 CREATE TABLE IF NOT EXISTS known_leads (
     phone              TEXT NOT NULL,       -- E.164, e.g. +919876543210
     customer_name      TEXT NOT NULL,       -- dealership key (FK to tenants)
@@ -66,12 +56,9 @@ CREATE TABLE IF NOT EXISTS known_leads (
     expires_at         INTEGER NOT NULL,    -- epoch seconds; cleaned up by /healthz
     PRIMARY KEY (phone, customer_name)
 );
--- Fast lookup by phone+dealership (hot path: inbound agent at call start)
 CREATE INDEX IF NOT EXISTS idx_leads_phone ON known_leads(phone, customer_name);
--- Fast TTL cleanup (runs every 5 min via /healthz + UptimeRobot)
 CREATE INDEX IF NOT EXISTS idx_leads_expires ON known_leads(expires_at);
 """
-
 
 @contextmanager
 def db():
@@ -82,20 +69,25 @@ def db():
     finally:
         conn.close()
 
-
 def init_db():
     with db() as conn:
         conn.executescript(SCHEMA)
         conn.commit()
 
-
 init_db()
 
-
 # ─── Mount the admin UI (HTML + JSON CRUD) ─────────────────────────────
-from admin import router as admin_router   # noqa: E402  (after init_db)
+from admin import router as admin_router   # noqa: E402
 app.include_router(admin_router)
 
+# ─── Events ────────────────────────────────────────────────────────────
+@app.on_event("startup")
+async def startup_event():
+    pass
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    pass
 
 # ─── Models ────────────────────────────────────────────────────────────
 class DispatchResponse(BaseModel):
@@ -103,8 +95,7 @@ class DispatchResponse(BaseModel):
     room:    str
     dispatch_id: str
 
-
-# ─── Endpoint ──────────────────────────────────────────────────────────
+# ─── Dispatch Endpoint ─────────────────────────────────────────────────
 @app.post("/dispatch", response_model=DispatchResponse, status_code=202)
 async def dispatch(
     lead: dict[str, Any],
@@ -130,44 +121,23 @@ async def dispatch(
 
     tenant = dict(row)
 
-    # 2. Normalize phone (very simple — assume India)
+    # 2. Normalize phone
     phone = _normalize_phone(phone)
 
-    # 3. Build the metadata blob the agent will read
-    room_name = f"out-{lead_id}-{int(time.time())}"
-    metadata = {
-        "direction": "outbound",
-        "tenant": {
-            "customer_name":   tenant["customer_name"],
-            "dealership_name": tenant["dealership_name"],
-            "agent_persona":   tenant["agent_persona"],
-            "language":        tenant["language"],
-            "voice":           tenant["voice"],
-            "transfer_to":     tenant["transfer_to"],
-            "extra_prompt":    tenant["extra_prompt"],
-            "callback_url":    tenant["callback_url"],
-            "callback_key":    AGENT_API_KEY,
-        },
-        "lead":         {**lead, "phone": phone},
-        "phone_number": phone,
-    }
-
-    # 4. Dispatch via LiveKit (it queues, retries, and scales for us)
-    lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+    # 3. Dispatch via FreeSWITCH ESL
     try:
-        result = await lkapi.agent_dispatch.create_dispatch(
-            api.CreateAgentDispatchRequest(
-                agent_name=OUTBOUND_AGENT,
-                room=room_name,
-                metadata=json.dumps(metadata),
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                "http://127.0.0.1:8080/txtapi/originate",
+                auth=("freeswitch", "works"),
+                data=f"{{ignore_early_media=true,origination_caller_id_number={phone}}}sofia/gateway/default/{phone} &transfer(ai_agent XML default)"
             )
-        )
-    finally:
-        await lkapi.aclose()
+            if resp.status_code != 200 or "+OK" not in resp.text:
+                print(f"FreeSWITCH Originate Failed: {resp.text}")
+    except Exception as e:
+        raise HTTPException(500, f"Failed to originate call: {str(e)}")
 
-    # 5. Store lead for inbound callback recognition.
-    #    INSERT OR REPLACE keeps only the freshest data per (phone, dealership).
-    #    expires_at is calculated in Python so it uses LEAD_TTL_DAYS at runtime.
+    # 4. Store lead context
     expires_at = int(time.time()) + LEAD_TTL_DAYS * 86400
     with db() as conn:
         conn.execute(
@@ -179,22 +149,38 @@ async def dispatch(
         )
         conn.commit()
 
-    return DispatchResponse(room=room_name, dispatch_id=result.id)
+    return DispatchResponse(room="freeswitch", dispatch_id=lead_id)
 
+# ─── WebSocket Endpoint for mod_audio_stream ───────────────────────────
+@app.websocket("/ws/{call_id}")
+async def websocket_endpoint(websocket: WebSocket, call_id: str):
+    await websocket.accept()
+    print(f"[WebSocket] Call connected: {call_id}")
+    
+    frames_received = 0
+    try:
+        while True:
+            # mod_audio_stream sends the stream data
+            data = await websocket.receive()
+            if "bytes" in data and data["bytes"]:
+                frames_received += 1
+                if frames_received % 50 == 0:  # Log every ~1 second of audio
+                    print(f"[WebSocket] Received {frames_received} audio frames for {call_id}")
+            elif "text" in data and data["text"]:
+                print(f"[WebSocket] Metadata from {call_id}: {data['text']}")
+                
+    except WebSocketDisconnect:
+        print(f"[WebSocket] Call disconnected: {call_id}")
+    except Exception as e:
+        print(f"[WebSocket] Error on {call_id}: {e}")
 
-# ─── Lead context lookup (called by inbound agent at call start) ────────
+# ─── Lead context lookup ───────────────────────────────────────────────
 @app.get("/lead/by-phone")
 def lead_by_phone(
     phone: str,
     customer_name: str,
     x_api_key: str = Header(...),
 ):
-    """Return stored lead JSON for a given phone + dealership.
-
-    Auth: same AGENT_API_KEY the agent uses for ALR callbacks.
-    Returns {} if not found or expired (agent gracefully starts fresh).
-    Called once per inbound call, before the greeting — not during conversation.
-    """
     if x_api_key != AGENT_API_KEY:
         raise HTTPException(401, "bad api key")
     phone = _normalize_phone(phone)
@@ -208,18 +194,12 @@ def lead_by_phone(
         return json.loads(row["lead_json"])
     return {}
 
-
 @app.delete("/lead/by-phone")
 def delete_lead(
     phone: str,
     customer_name: str,
     x_api_key: str = Header(...),
 ):
-    """Delete a single lead from the known_leads store.
-
-    Use for DPDP compliance (right-to-erasure) or manual ops.
-    Auth: AGENT_API_KEY.
-    """
     if x_api_key != AGENT_API_KEY:
         raise HTTPException(401, "bad api key")
     phone = _normalize_phone(phone)
@@ -231,18 +211,14 @@ def delete_lead(
         conn.commit()
     return {"ok": True}
 
-
 @app.get("/healthz")
 async def healthz():
-    # TTL cleanup: delete expired leads. Runs every 5 min via UptimeRobot ping.
-    # Single indexed DELETE — takes <1ms on SQLite, no new infrastructure needed.
     with db() as conn:
         deleted = conn.execute(
             "DELETE FROM known_leads WHERE expires_at < strftime('%s','now')"
         ).rowcount
         conn.commit()
     return {"ok": True, "expired_leads_purged": deleted}
-
 
 # ─── Tiny helpers ──────────────────────────────────────────────────────
 def _normalize_phone(raw: str) -> str:

@@ -47,8 +47,8 @@ RUN git clone --recurse-submodules https://github.com/amigniter/mod_audio_stream
     && export PKG_CONFIG_PATH=/usr/local/freeswitch/lib/pkgconfig:$PKG_CONFIG_PATH \
     && cmake -DFREESWITCH_SRC_DIR=/usr/src/freeswitch -DFREESWITCH_CORE_LIBRARY=/usr/local/freeswitch/lib/libfreeswitch.so .. \
     && make \
-    && mkdir -p /usr/local/freeswitch/mod \
-    && cp mod_audio_stream.so /usr/local/freeswitch/mod/
+    && mkdir -p /usr/local/freeswitch/lib/freeswitch/mod \
+    && cp mod_audio_stream.so /usr/local/freeswitch/lib/freeswitch/mod/
 
 # Enable the module in the config
 RUN cp -r /usr/src/freeswitch/conf/vanilla /usr/local/freeswitch/conf \

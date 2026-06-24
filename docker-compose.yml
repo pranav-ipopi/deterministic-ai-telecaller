@@ -20,6 +20,9 @@ services:
     # ------------------------------------------------------------------------
     # network_mode: "host" 
     
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     ports:
       # SIP Signaling Ports
       - "5060:5060/tcp"
@@ -30,13 +33,20 @@ services:
       # Event Socket (Control Port)
       - "8021:8021/tcp"
       
+      # Additional Port
+      - "8080:8080/tcp"
+      
       # Restricted RTP Audio Range (for local testing only!)
       - "16384-16484:16384-16484/udp"
       
     volumes:
-      # Mount custom configurations here later
-      # - ./conf:/usr/local/freeswitch/conf
+      # Mount custom configurations here
+      - ./conf:/usr/local/freeswitch/etc/freeswitch
       - freeswitch-sounds:/usr/local/freeswitch/sounds
+      
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.default.disable_ipv6=0
       
     environment:
       - TZ=UTC

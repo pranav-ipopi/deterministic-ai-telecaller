@@ -1,0 +1,18 @@
+<include>
+  <!-- Route calls to the AI Agent -->
+  <extension name="ai_agent">
+    <condition field="destination_number" expression="^5555$|^ai_agent$">
+      
+      <!-- Trigger the WebSocket audio stream API command right as the call answers -->
+      <!-- We pass the unique call ID (uuid) to the Python backend in the URL -->
+      <action application="set" data="api_on_answer=uuid_audio_stream ${uuid} start ws://host.docker.internal:8000/ws/${uuid} mono 8k"/>
+      
+      <!-- Answer the call -->
+      <action application="answer"/>
+      
+      <!-- Park the call (keeps the line open indefinitely while the AI listens/speaks) -->
+      <action application="park"/>
+      
+    </condition>
+  </extension>
+</include>

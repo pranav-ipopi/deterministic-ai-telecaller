@@ -230,8 +230,8 @@
     "semantic_hash": ""
   },
   "IMPLEMENTATION_PLAN.md": {
-    "mtime": 1782281956.7631066,
-    "ast_hash": "7fc957c4d3fdc4ab6a39213ebb698a16",
+    "mtime": 1782302763.8917224,
+    "ast_hash": "d43151a9834b76204f0de789b66fd3fb",
     "semantic_hash": ""
   },
   "api/requirements.txt": {
@@ -272,6 +272,76 @@
   "flow.txt": {
     "mtime": 1782285789.2320664,
     "ast_hash": "9c8f88fb9ab708d4fba0f2577961d027",
+    "semantic_hash": ""
+  },
+  ".agents/plugins/marketplace.json": {
+    "mtime": 1782287576.3521879,
+    "ast_hash": "c3cd74c0b7ac03e18cfe92ef4051d5e3",
+    "semantic_hash": ""
+  },
+  "generate-placeholders.sh": {
+    "mtime": 1782288392.5056016,
+    "ast_hash": "f01deb417983bb346c5dbb2c319906cf",
+    "semantic_hash": ""
+  },
+  "setup_wsl.sh": {
+    "mtime": 1782303488.3531263,
+    "ast_hash": "d401355c307e06962b693dbcfcd5f10e",
+    "semantic_hash": ""
+  },
+  ".agents/rules/ponytail.md": {
+    "mtime": 1782287576.353182,
+    "ast_hash": "a7f4b5ab90b559b89273dc81243df6fb",
+    "semantic_hash": ""
+  },
+  ".agents/skills/ponytail-audit/SKILL.md": {
+    "mtime": 1782287576.4740028,
+    "ast_hash": "741076540e91247a0bace7b89c27ac6b",
+    "semantic_hash": ""
+  },
+  ".agents/skills/ponytail-debt/SKILL.md": {
+    "mtime": 1782287576.4740028,
+    "ast_hash": "19c1eef33c9b109abb5805a762a545c8",
+    "semantic_hash": ""
+  },
+  ".agents/skills/ponytail-gain/SKILL.md": {
+    "mtime": 1782287576.476017,
+    "ast_hash": "8f9cd980326238785d2fc23a9cfddc96",
+    "semantic_hash": ""
+  },
+  ".agents/skills/ponytail-help/SKILL.md": {
+    "mtime": 1782287576.4765806,
+    "ast_hash": "1249040527776216867a9f422d9f51e4",
+    "semantic_hash": ""
+  },
+  ".agents/skills/ponytail-review/SKILL.md": {
+    "mtime": 1782287576.4765806,
+    "ast_hash": "52f93e973047baa9a906c6dc5879a4a6",
+    "semantic_hash": ""
+  },
+  ".agents/skills/ponytail/SKILL.md": {
+    "mtime": 1782287576.4765806,
+    "ast_hash": "b8c2df06e57a19e5319b64b13f645d99",
+    "semantic_hash": ""
+  },
+  "FREESWITCH_DEPLOYMENT.md": {
+    "mtime": 1782314849.0896363,
+    "ast_hash": "d98d60c5a58949ceb67f06b3e4613931",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1782316544.8640563,
+    "ast_hash": "3b2e6f5c6b5599d699bca0542a3a8397",
+    "semantic_hash": ""
+  },
+  "docker-compose.yml": {
+    "mtime": 1782314676.16895,
+    "ast_hash": "5adce90feb2506a5fbe85259f9049503",
+    "semantic_hash": ""
+  },
+  "ponytail_readme.md": {
+    "mtime": 1782287541.555241,
+    "ast_hash": "8323e1e2c54f35a08c4e3d7ee08b15b4",
     "semantic_hash": ""
   }
 }

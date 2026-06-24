@@ -2,6 +2,8 @@
 
 This document explains the architecture, dependencies, and gotchas involved in building and deploying the custom FreeSWITCH Docker container for the AI Telecaller project.
 
+👉 **Next Phase:** Once FreeSWITCH is deployed, see [FreeSWITCH WebSocket Integration & Troubleshooting](docs/freeswitch_websocket_integration.md) for how to bridge the audio stream into the Python API.
+
 ## Why Compile from Source?
 To stream raw audio from phone calls to an AI agent in real-time, this project relies on a custom, community-built FreeSWITCH module called `mod_audio_stream`.
 Because this is not an official module, it does not exist in standard package managers (like `apt-get`). To use it, we must compile it from source. Compiling a FreeSWITCH module requires the FreeSWITCH core source code, which in turn forces us to compile FreeSWITCH from scratch.
