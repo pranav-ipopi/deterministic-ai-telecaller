@@ -75,13 +75,13 @@
     "semantic_hash": ""
   },
   "api/admin.py": {
-    "mtime": 1781942836.9981146,
-    "ast_hash": "f038117b5b3aede8f2aef65b0fefd3e5",
+    "mtime": 1782318088.6784446,
+    "ast_hash": "3788edb2199869782d621031b44af3fd",
     "semantic_hash": ""
   },
   "api/main.py": {
-    "mtime": 1781942835.5863814,
-    "ast_hash": "6bc26f3dec00db93589c07f918f0a7c9",
+    "mtime": 1782321327.109531,
+    "ast_hash": "e2ad80dde1c7bc4286e55c7a0d668599",
     "semantic_hash": ""
   },
   "api/seed_tenants.py": {
@@ -230,13 +230,13 @@
     "semantic_hash": ""
   },
   "IMPLEMENTATION_PLAN.md": {
-    "mtime": 1782302763.8917224,
-    "ast_hash": "d43151a9834b76204f0de789b66fd3fb",
+    "mtime": 1782317125.8822188,
+    "ast_hash": "f8d461b251a33e39cee61bda20289790",
     "semantic_hash": ""
   },
   "api/requirements.txt": {
-    "mtime": 1781855544.2148843,
-    "ast_hash": "6d3a62bfd18a3c6db6f87e82bd3ddae1",
+    "mtime": 1782321337.1775947,
+    "ast_hash": "95080b8aef4259372e26d9e1b032900d",
     "semantic_hash": ""
   },
   "docs/TESTING_OUTBOUND.md": {
@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "FREESWITCH_DEPLOYMENT.md": {
-    "mtime": 1782314849.0896363,
-    "ast_hash": "d98d60c5a58949ceb67f06b3e4613931",
+    "mtime": 1782325069.7494113,
+    "ast_hash": "ef538ae1571b2e1b89f91d659cfb2dcc",
     "semantic_hash": ""
   },
   "README.md": {
@@ -335,13 +335,38 @@
     "semantic_hash": ""
   },
   "docker-compose.yml": {
-    "mtime": 1782314676.16895,
-    "ast_hash": "5adce90feb2506a5fbe85259f9049503",
+    "mtime": 1782324486.9727836,
+    "ast_hash": "3bb3898942b34224d0501f76672ab1d8",
     "semantic_hash": ""
   },
   "ponytail_readme.md": {
     "mtime": 1782287541.555241,
     "ast_hash": "8323e1e2c54f35a08c4e3d7ee08b15b4",
+    "semantic_hash": ""
+  },
+  "api/esl_client.py": {
+    "mtime": 1782318672.7519555,
+    "ast_hash": "b4b488b8654d703bcad9068c1017fcb3",
+    "semantic_hash": ""
+  },
+  "conf/README_IMPORTANT.txt": {
+    "mtime": 1782314287.0,
+    "ast_hash": "08388404f4cbeeefd008f3740a31e938",
+    "semantic_hash": ""
+  },
+  "conf/yaml/extensions.yaml": {
+    "mtime": 1782314287.0,
+    "ast_hash": "147b16bfe34e2c05e91fc071433f1f86",
+    "semantic_hash": ""
+  },
+  "conf/yaml/mod_yaml.yaml": {
+    "mtime": 1782314287.0,
+    "ast_hash": "bcb174faea91382ea9580bfdab10909d",
+    "semantic_hash": ""
+  },
+  "docs/freeswitch_websocket_integration.md": {
+    "mtime": 1782325034.823465,
+    "ast_hash": "3f8fb637f6a550e2c79a8e7192cb427d",
     "semantic_hash": ""
   }
 }

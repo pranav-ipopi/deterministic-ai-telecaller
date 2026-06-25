@@ -1,16 +1,16 @@
 # Graph Report - AI-telecaller-v1-deterministic-hybrid  (2026-06-24)
 
 ## Corpus Check
-- 63 files · ~84,105 words
+- 65 files · ~85,216 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 480 nodes · 526 edges · 50 communities (39 shown, 11 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 8 edges (avg confidence: 0.8)
+- 501 nodes · 547 edges · 51 communities (40 shown, 11 thin omitted)
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 8 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9a188d38`
+- Built from commit: `8ee20466`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -63,6 +63,7 @@
 - [[_COMMUNITY_Community 47|Community 47]]
 - [[_COMMUNITY_Community 48|Community 48]]
 - [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `ALR Voice Agent — V1 Setup From Scratch` - 18 edges
@@ -91,7 +92,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (50 total, 11 thin omitted)
+## Communities (51 total, 11 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -110,7 +111,7 @@ Cohesion: 0.14
 Nodes (21): admin_page(), delete_tenant(), leads_count(), list_tenants(), login_submit(), manual_sync(), purge_all_leads(), purge_expired_leads() (+13 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (31): admin_page(), delete_tenant(), leads_count(), list_tenants(), login_submit(), manual_sync(), purge_all_leads(), purge_expired_leads() (+23 more)
 
 ### Community 5 - "Community 5"
@@ -155,7 +156,7 @@ Nodes (8): Prerequisites, Step 1: Create a Client (Dealership), Step 2: Trigger 
 
 ### Community 15 - "Community 15"
 Cohesion: 0.09
-Nodes (21): API & Core Engine (Python only), Architecture Highlights, Conversation & Fault Tolerance, Core Infrastructure (WSL Local), Implementation Plan for AI Voice Agent V1 (FreeSWITCH + Deterministic Hybrid), [MODIFY] [api/main.py](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/api/main.py), [MODIFY] [api/requirements.txt](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/api/requirements.txt), [NEW] [api/audio_buffer.py](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/api/audio_buffer.py) (+13 more)
+Nodes (22): API & Core Engine (Python only), Architecture Highlights, Conversation & Fault Tolerance, Core Infrastructure (Docker & Telephony), Implementation Plan for AI Voice Agent V1 (FreeSWITCH + Deterministic Hybrid), [MODIFY] [api/main.py](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/api/main.py), [MODIFY] [api/requirements.txt](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/api/requirements.txt), [MODIFY] [docker-compose.yml](file:///c:/Users/HP/Documents/voice-agent/AI-telecaller-v1-deterministic-hybrid/docker-compose.yml) (+14 more)
 
 ### Community 16 - "Community 16"
 Cohesion: 0.22
@@ -218,8 +219,8 @@ Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
 ### Community 35 - "Community 35"
-Cohesion: 0.33
-Nodes (5): FreeSWITCH AI Voice Agent - Deployment & Build Guide, Multi-Stage Docker Build, The Dependency Minefield (What we fixed), VPS Deployment (Docker Compose), Why Compile from Source?
+Cohesion: 0.12
+Nodes (14): 1. Architecture Overview, 2. The Core Configuration, 3. Major Hurdles Encountered & Solved, 4. How to Test & Verify (For New Devs), FreeSWITCH WebSocket Integration & Troubleshooting, Hurdle 1: Uvicorn Binding to Localhost (`127.0.0.1`), Hurdle 2: Docker Desktop's Broken DNS (`host.docker.internal`), Hurdle 3: Volume Mounting Errors (+6 more)
 
 ### Community 41 - "Community 41"
 Cohesion: 0.40
@@ -241,8 +242,12 @@ Nodes (3): main(), Create / refresh LiveKit SIP Dispatch Rules from tenants.db. 
 Cohesion: 0.50
 Nodes (3): Boundaries, Output, Scan
 
+### Community 50 - "Community 50"
+Cohesion: 0.29
+Nodes (3): ESLClient, Establish a pure asyncio raw socket connection to FreeSWITCH ESL., Originates an outbound call via a SIP gateway.         When answered, the call i
+
 ## Knowledge Gaps
-- **247 isolated node(s):** `graphify`, `Ponytail, lazy senior dev mode`, `Usage`, `What graphify is for`, `Step 0 - GitHub repos and multi-path merge (only if a URL or several paths)` (+242 more)
+- **254 isolated node(s):** `Why Compile from Source?`, `The Dependency Minefield (What we fixed)`, `Multi-Stage Docker Build`, `VPS Deployment (Docker Compose)`, `Architecture Highlights` (+249 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -250,11 +255,11 @@ Nodes (3): Boundaries, Output, Scan
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `dispatch()` connect `Community 4` to `Community 1`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `db()` (e.g. with `delete_tenant()` and `leads_count()`) actually correct?**
   _`db()` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `graphify`, `Ponytail, lazy senior dev mode`, `Usage` to the rest of the system?**
-  _279 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `Why Compile from Source?`, `The Dependency Minefield (What we fixed)`, `Multi-Stage Docker Build` to the rest of the system?**
+  _286 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.046511627906976744 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
